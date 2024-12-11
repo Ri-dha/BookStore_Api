@@ -1,5 +1,7 @@
 using System.Globalization;
 using BookStoreTask.Data;
+using BookStoreTask.FilesMod;
+using BookStoreTask.Utli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -8,6 +10,8 @@ using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddApplicationServices(builder.Configuration);
 
 builder.Services.AddDbContext<ProjectContext>(options =>
         options.UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }))
@@ -49,6 +53,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations();
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
     // Add JWT Authentication to Swagger
     var securityScheme = new OpenApiSecurityScheme
     {
@@ -57,8 +62,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description =
-            "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: 'Bearer 12345abcdef'",
+        Description = "Enter 'Bearer' [space] and then your token.",
     };
 
     options.AddSecurityDefinition("Bearer", securityScheme);
@@ -79,7 +83,12 @@ builder.Services.AddSwaggerGen(options =>
     };
 
     options.AddSecurityRequirement(securityRequirement);
+
+    // Explicitly handle file uploads in Swagger
+    options.OperationFilter<SwaggerFileOperationFilter>();
 });
+
+
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 
 
@@ -96,8 +105,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowLocalhost");
-app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

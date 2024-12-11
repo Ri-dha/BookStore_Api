@@ -1,4 +1,8 @@
-﻿using BookStoreTask.Utli;
+﻿using BookStoreTask.FilesMod;
+using BookStoreTask.Users.Admins;
+using BookStoreTask.Users.BaseUser;
+using BookStoreTask.Users.Customers;
+using BookStoreTask.Utli;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreTask.Data;
@@ -10,10 +14,15 @@ public class ProjectContext: DbContext
     {
     }
 
-    
+    public DbSet<ProjectFiles> Files { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Customer> Customers { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Customer>().HasBaseType<User>();
+        modelBuilder.Entity<Admin>().HasBaseType<User>();
         
     }
     

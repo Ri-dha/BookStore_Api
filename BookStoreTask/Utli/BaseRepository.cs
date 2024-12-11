@@ -13,6 +13,7 @@ public interface IBaseRepository<T, TId>
     Task<List<T>> AddAll(List<T> data);
     T AddNow(T t);
     Task<T?> Remove(TId id);
+    Task<T?> SoftDelete(TId id);
     Task<List<T>> RemoveAll(List<TId> ids);
     Task<T?> Update(T t, TId id);
     Task<List<T>> UpdateAll(List<T> data);
@@ -94,6 +95,16 @@ public abstract class BaseRepository<T, TId> : IBaseRepository<T, TId>
         _context.Set<T>().Remove(result);
         await _context.SaveChangesAsync();
         return result;
+    }
+
+    public async Task<T?> SoftDelete(TId id)
+    {
+        var entity = await GetById(id);
+        if (entity == null) return null;
+
+        entity.Deleted = true;
+        await _context.SaveChangesAsync();
+        return entity;
     }
 
     public async Task<List<T>> RemoveAll(List<TId> ids)

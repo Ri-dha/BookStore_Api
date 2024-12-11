@@ -1,4 +1,11 @@
 ﻿using System.Text;
+using BookStoreTask.Auth;
+using BookStoreTask.FilesMod;
+using BookStoreTask.Users.Admins;
+using BookStoreTask.Users.BaseUser.Repository;
+using BookStoreTask.Users.Customers;
+using BookStoreTask.Users.Mapper;
+using BookStoreTask.Users.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -9,11 +16,16 @@ public static class ApplicationServicesExtension
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
-
+        services.AddScoped<IFileRepository, FileRepository>();
+        services.AddScoped<IFileService, FileService>();
+        services.AddScoped<IAdminRepository, AdminRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IUserServices, UserServices>();
         
         
-        
-        // services.AddAutoMapper();
+        services.AddAutoMapper(typeof(UserMapper));
         
         
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
