@@ -85,7 +85,7 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(securityRequirement);
 
     // Explicitly handle file uploads in Swagger
-    options.OperationFilter<SwaggerFileOperationFilter>();
+    // options.OperationFilter<SwaggerFileOperationFilter>();
 });
 
 

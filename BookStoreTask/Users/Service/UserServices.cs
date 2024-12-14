@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BookStoreTask.Auth;
+using BookStoreTask.Cart;
 using BookStoreTask.FilesMod;
 using BookStoreTask.Users.Admins;
 using BookStoreTask.Users.BaseUser;
@@ -32,14 +33,16 @@ public class UserServices : IUserServices
     private readonly IMapper _mapper;
     private readonly ITokenService _tokenService;
     private readonly IFileService _fileService;
+    private readonly ICartServices _cartServices;
 
     public UserServices(IRepositoryWrapper repositoryWrapper, IMapper mapper, ITokenService tokenService,
-        IFileService fileService)
+        IFileService fileService, ICartServices cartServices)
     {
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
         _tokenService = tokenService;
         _fileService = fileService;
+        _cartServices = cartServices;
     }
 
     public async Task<(UserDto? user, string? error)> Delete(Guid id)
@@ -119,7 +122,7 @@ public class UserServices : IUserServices
             return (null, "Password or email are incorrect");
         }
 
-        user.LastLogin = DateTime.Now;
+        user.LastLogin = DateTime.UtcNow;
         await _repositoryWrapper.UserRepository.Update(user, user.Id);
         var token = _tokenService.CreateToken(user);
         var dto = _mapper.Map<UserDto>(user);
@@ -201,9 +204,14 @@ public class UserServices : IUserServices
         }
         user.Role = Roles.Customer;
 
-        await _repositoryWrapper.CustomerRepository.Add(user);
+        var newUser=await _repositoryWrapper.CustomerRepository.Add(user);
         var dto = _mapper.Map<UserDto>(user);
         dto.Token = _tokenService.CreateToken(user);
+        
+        var cart = await _cartServices.CreateCart(newUser.Id);
+        
+        
+        
         return (dto, null);
     }
 
@@ -218,6 +226,7 @@ public class UserServices : IUserServices
         _mapper.Map(customerUpdateForm, customer);
         if (customerUpdateForm.ProfileImage != null)
         {
+            customer.ProfileImage = null;
             var image = await _fileService.SaveFileAsync(customerUpdateForm.ProfileImage);
             customer.ProfileImage = image;
         }
@@ -281,6 +290,7 @@ public class UserServices : IUserServices
         _mapper.Map(updateForm, admin);
         if (updateForm.ProfileImage != null)
         {
+            admin.ProfileImage = null;
             var image = await _fileService.SaveFileAsync(updateForm.ProfileImage);
             admin.ProfileImage = image;
         }
