@@ -2,6 +2,7 @@
 using BookStoreTask.BookMod.Catograzation.Payload;
 using BookStoreTask.BookMod.Catograzation.Services;
 using BookStoreTask.Utli;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreTask.BookMod.Catograzation.Controllers;
@@ -17,6 +18,7 @@ public class GenereController : BaseController
     }
 
     [HttpPost("add")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> AddGenere([FromBody] GenereCreateForm form)
     {
         var (genereDto, error) = await _genreServices.AddGenreAsync(form);
@@ -25,6 +27,7 @@ public class GenereController : BaseController
     }
 
     [HttpPut("update/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> UpdateGenere([FromBody] GenereUpdateForm form, Guid id)
     {
         var (genereDto, error) = await _genreServices.UpdateGenreAsync(form, id);
@@ -33,6 +36,7 @@ public class GenereController : BaseController
     }
 
     [HttpDelete("delete/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeleteGenere(Guid id)
     {
         var (genereDto, error) = await _genreServices.DeleteGenreAsync(id);

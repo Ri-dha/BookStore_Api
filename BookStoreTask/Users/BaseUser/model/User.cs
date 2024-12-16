@@ -11,5 +11,5 @@ public class User: BaseEntity<Guid>
     public string Password { get; set; }
     public Roles? Role { get; set; }
     public DateTime? LastLogin { get; set; }
-    public ProjectFiles ProfileImage { get; set; }
+    public ProjectFiles? ProfileImage { get; set; }
 }

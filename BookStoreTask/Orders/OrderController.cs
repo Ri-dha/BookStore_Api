@@ -1,4 +1,5 @@
 ﻿using BookStoreTask.Utli;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreTask.Orders;
@@ -15,6 +16,7 @@ public class OrderController : BaseController
 
 
     [HttpPut("accept/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> AcceptOrder(Guid id)
     {
         var (orderDto, error) = await _ordersServices.AcceptOrder(id);
@@ -23,6 +25,7 @@ public class OrderController : BaseController
     }
 
     [HttpPut("ship/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> ShipOrder(Guid id)
     {
         var (orderDto, error) = await _ordersServices.ShipOrder(id);
@@ -31,6 +34,7 @@ public class OrderController : BaseController
     }
 
     [HttpPut("deliver/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeliverOrder(Guid id)
     {
         var (orderDto, error) = await _ordersServices.DeliverOrder(id);

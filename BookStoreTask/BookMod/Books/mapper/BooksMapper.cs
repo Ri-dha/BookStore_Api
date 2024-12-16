@@ -32,7 +32,8 @@ public class BooksMapper : Profile
             .ForMember(dest => dest.Images, opt => opt.Ignore()); // Images will be handled separately
             
         CreateMap<BookUpdateForm, BooksModel>()
-            .ForMember(dest => dest.Images, opt => opt.Ignore());
+            .ForMember(dest => dest.Images, opt => opt.Ignore())
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         
         
     }

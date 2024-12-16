@@ -2,6 +2,7 @@
 using BookStoreTask.BookMod.Books.Payloads;
 using BookStoreTask.BookMod.Books.services;
 using BookStoreTask.Utli;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreTask.BookMod.Books.Controllers;
@@ -18,6 +19,7 @@ public class BooksController:BaseController
     }
     
     [HttpPost("add")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> AddBook([FromForm] BookCreateForm form)
     {
         var (bookDto, error) = await _booksServices.AddBookAsync(form);
@@ -26,6 +28,8 @@ public class BooksController:BaseController
     }
     
     [HttpPut("update/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
+
     public async Task<IActionResult> UpdateBook([FromBody] BookUpdateForm form,Guid id)
     {
         var (bookDto, error) = await _booksServices.UpdateBookAsync(form,id);
@@ -34,6 +38,7 @@ public class BooksController:BaseController
     }
     
     [HttpDelete("delete/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeleteBook(Guid id)
     {
         var (bookDto, error) = await _booksServices.DeleteBookAsync(id);

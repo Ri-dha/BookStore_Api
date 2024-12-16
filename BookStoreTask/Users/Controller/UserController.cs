@@ -20,6 +20,7 @@ public class UserController : BaseController
     }
 
     [HttpGet("all-customers")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> GetUsers([FromQuery] CustomerFilter userFilter)
     {
         var (users, totalCount, error) = await _userServices.GetAllCustomers(userFilter);
@@ -34,6 +35,7 @@ public class UserController : BaseController
     }
 
     [HttpGet("all-admins")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> GetAdmins([FromQuery] AdminFilter userFilter)
     {
         var (users, totalCount, error) = await _userServices.GetAllAdmins(userFilter);
@@ -56,6 +58,7 @@ public class UserController : BaseController
     }
 
     [HttpDelete("delete/{id}")]
+    [Authorize(Policy = "ManagerPolicy")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         var (user, error) = await _userServices.Delete(id);
@@ -74,6 +77,7 @@ public class UserController : BaseController
 
     [HttpPut("update-admin/{id}")]
     [Consumes("multipart/form-data")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> UpdateAdmin(Guid id, [FromForm] AdminUpdateForm adminUpdateForm)
     {
         var (user, error) = await _userServices.UpdateAdmin(adminUpdateForm, id);
@@ -83,6 +87,7 @@ public class UserController : BaseController
 
     [HttpPut("update-customer/{id}")]
     [Consumes("multipart/form-data")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> UpdateCustomer(Guid id, [FromForm] CustomerUpdateForm customerUpdateForm)
     {
         var (user, error) = await _userServices.UpdateCustomer(customerUpdateForm, id);

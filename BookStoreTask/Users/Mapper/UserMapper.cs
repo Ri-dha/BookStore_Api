@@ -31,11 +31,14 @@ public class UserMapper : Profile
 
         CreateMap<AdminForm, Admin>()
             .IncludeBase<UserForm, User>()
-            .ForMember(dest => dest.AdministrativeRole, opt => opt.MapFrom(src => src.AdministrativeRole));
+            .ForMember(dest => dest.AdministrativeRole, opt => opt.MapFrom(src => src.AdministrativeRole))
+            .ForMember(dest => dest.ProfileImage, opt => opt.Ignore());
 
         CreateMap<AdminUpdateForm, Admin>()
             .IncludeBase<UserUpdateForm, User>()
-            .ForMember(dest => dest.AdministrativeRole, opt => opt.MapFrom(src => src.AdministrativeRole));
+            .ForMember(dest => dest.AdministrativeRole, opt => opt.MapFrom(src => src.AdministrativeRole))
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
 
         // Customer Specific Mapping
         CreateMap<Customer, CustomerDto>()
@@ -43,10 +46,14 @@ public class UserMapper : Profile
             .ReverseMap();
 
         CreateMap<CustomerForm, Customer>()
-            .IncludeBase<UserForm, User>();
+            .IncludeBase<UserForm, User>()
+            .ForMember(dest => dest.ProfileImage, opt => opt.Ignore());
+            
 
         CreateMap<CustomerUpdateForm, Customer>()
             .IncludeBase<UserUpdateForm, User>()
-            .ForMember(dest => dest.CustomerStatus, opt => opt.MapFrom(src => src.CustomerStatus));
+            .ForMember(dest => dest.CustomerStatus, opt => opt.MapFrom(src => src.CustomerStatus))
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
     }
 }

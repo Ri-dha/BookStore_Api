@@ -2,6 +2,7 @@
 using BookStoreTask.BookMod.Catograzation.Payload;
 using BookStoreTask.BookMod.Catograzation.Services;
 using BookStoreTask.Utli;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreTask.BookMod.Catograzation.Controllers;
@@ -18,6 +19,7 @@ public class AuthorController:BaseController
     }
     
     [HttpPost("add")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> AddAuthor([FromForm] AuthorCreateForm form)
     {
         var (authorDto, error) = await _authorServices.AddAuthorAsync(form);
@@ -26,7 +28,8 @@ public class AuthorController:BaseController
     }
     
     [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateAuthor([FromBody] AuthorUpdateForm form,Guid id)
+    [Authorize(Policy = "AdminPolicy")]
+    public async Task<IActionResult> UpdateAuthor([FromForm] AuthorUpdateForm form,Guid id)
     {
         var (authorDto, error) = await _authorServices.UpdateAuthorAsync(form,id);
         if (error != null)return BadRequest(new {error});
@@ -34,6 +37,7 @@ public class AuthorController:BaseController
     }
     
     [HttpDelete("delete/{id}")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeleteAuthor(Guid id)
     {
         var (authorDto, error) = await _authorServices.DeleteAuthorAsync(id);

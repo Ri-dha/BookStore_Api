@@ -29,7 +29,7 @@ public class TokenService: ITokenService
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.Email, user.Email ?? string.Empty),
-            new Claim("role", user.Role.ToString() ?? string.Empty),
+            new Claim(ClaimTypes.Role, user.Role.ToString() ?? string.Empty),
             new Claim("mobilephone", user.PhoneNumber)
         };
 

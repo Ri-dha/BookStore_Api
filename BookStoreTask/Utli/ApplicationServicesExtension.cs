@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using BookStoreTask.Auth;
 using BookStoreTask.BookMod.Books.mapper;
 using BookStoreTask.BookMod.Books.Repository;
 using BookStoreTask.BookMod.Books.services;
+using BookStoreTask.BookMod.Catograzation.Mapper;
 using BookStoreTask.BookMod.Catograzation.Repoistories;
 using BookStoreTask.BookMod.Catograzation.Services;
 using BookStoreTask.Cart;
@@ -50,7 +52,8 @@ public static class ApplicationServicesExtension
             typeof(ProjectFilesMapper),
             typeof(CartMapper),
             typeof(BooksMapper),
-            typeof(OrdersMapper)
+            typeof(OrdersMapper),
+            typeof(CategoryMapper)
         );
 
 
@@ -70,10 +73,10 @@ public static class ApplicationServicesExtension
         services.AddAuthorization(options =>
         {
             options.AddPolicy("AdminPolicy", policy =>
-                policy.RequireClaim("role", Roles.Admin.ToString()));
+                policy.RequireClaim(ClaimTypes.Role, Roles.Admin.ToString()));
 
             options.AddPolicy("CustomerPolicy", policy =>
-                policy.RequireClaim("role", Roles.Customer.ToString()));
+                policy.RequireClaim(ClaimTypes.Role, Roles.Customer.ToString()));
 
             options.AddPolicy("ManagerPolicy", policy =>
                 policy.RequireClaim("adminRole", AdministrativeRoles.Manager.ToString()));

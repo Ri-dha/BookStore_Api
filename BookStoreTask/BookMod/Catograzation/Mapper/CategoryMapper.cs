@@ -54,10 +54,12 @@ public class CategoryMapper : Profile
 
         // Map AuthorUpdateForm to Authors
         CreateMap<AuthorUpdateForm, Authors>()
-            .ForMember(dest => dest.Image, opt => opt.Ignore()); // File handling is separate
+            .ForMember(dest => dest.Image, opt => opt.Ignore()) // File handling is separate
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
         // Map GenereUpdateForm to Genres
-        CreateMap<GenereUpdateForm, Genres>();
+        CreateMap<GenereUpdateForm, Genres>()
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null)); // Ignore null values
 
         // Map AuthorFilterForm to AuthorDto (for filtering)
         CreateMap<AuthorFilterForm, AuthorDto>();

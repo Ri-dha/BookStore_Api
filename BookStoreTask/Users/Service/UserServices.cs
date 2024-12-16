@@ -20,10 +20,10 @@ public interface IUserServices
     Task<(List<AdminDto>? user, int? totalCount, string? error)> GetAllAdmins(AdminFilter filter);
     Task<(List<object>? rolesList, string? error)> GetRoles();
     Task<(List<object>? adminRolesList, string? error)> GetAdminRoles();
-    Task<(UserDto? userDto, string? error)> RegisterCustomer(CustomerForm customerForm,IFormFile? profileImage);
+    Task<(UserDto? userDto, string? error)> RegisterCustomer(CustomerForm customerForm, IFormFile? profileImage);
     Task<(UserDto? userDto, string? error)> UpdateCustomer(CustomerUpdateForm customerUpdateForm, Guid id);
     Task<(UserDto? userDto, string? error)> ChangePassword(string oldPassword, string newPassword, Guid id);
-    Task<(UserDto? userDto, string? error)> RegisterAdmin(AdminForm adminForm,IFormFile? profileImage);
+    Task<(UserDto? userDto, string? error)> RegisterAdmin(AdminForm adminForm, IFormFile? profileImage);
     Task<(UserDto? userDto, string? error)> UpdateAdmin(AdminUpdateForm updateForm, Guid id);
 }
 
@@ -115,6 +115,39 @@ public class UserServices : IUserServices
             {
                 return (null, "Customer is blocked");
             }
+
+            if (!BCrypt.Net.BCrypt.Verify(loginForm.Password, user.Password))
+            {
+                return (null, "Password or email are incorrect");
+            }
+
+            user.LastLogin = DateTime.UtcNow;
+            await _repositoryWrapper.CustomerRepository.Update(customer, user.Id);
+            var tokenCustomer = _tokenService.CreateToken(customer);
+            var dtoCustomer = _mapper.Map<CustomerDto>(customer);
+            dtoCustomer.Token = tokenCustomer;
+            return (dtoCustomer, null);
+        }
+        
+        if (user.Role == Roles.Admin)
+        {
+            var admin = await _repositoryWrapper.AdminRepository.Get(x => x.Id == user.Id);
+            if (admin == null)
+            {
+                return (null, "Admin not found");
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(loginForm.Password, user.Password))
+            {
+                return (null, "Password or email are incorrect");
+            }
+
+            user.LastLogin = DateTime.UtcNow;
+            await _repositoryWrapper.AdminRepository.Update(admin, user.Id);
+            var tokenAdmin = _tokenService.CreateToken(admin);
+            var dtoAdmin = _mapper.Map<AdminDto>(admin);
+            dtoAdmin.Token = tokenAdmin;
+            return (dtoAdmin, null);
         }
 
         if (!BCrypt.Net.BCrypt.Verify(loginForm.Password, user.Password))
@@ -181,7 +214,8 @@ public class UserServices : IUserServices
         return (roles, null);
     }
 
-    public async Task<(UserDto? userDto, string? error)> RegisterCustomer(CustomerForm customerForm,IFormFile? profileImage)
+    public async Task<(UserDto? userDto, string? error)> RegisterCustomer(CustomerForm customerForm,
+        IFormFile? profileImage)
     {
         var customer = await _repositoryWrapper.UserRepository.Get(x => x.Email == customerForm.Email);
         if (customer != null)
@@ -202,16 +236,16 @@ public class UserServices : IUserServices
             var image = await _fileService.SaveFileAsync(profileImage);
             user.ProfileImage = image;
         }
+
         user.Role = Roles.Customer;
 
-        var newUser=await _repositoryWrapper.CustomerRepository.Add(user);
+        var newUser = await _repositoryWrapper.CustomerRepository.Add(user);
         var dto = _mapper.Map<UserDto>(user);
         dto.Token = _tokenService.CreateToken(user);
-        
+
         var cart = await _cartServices.CreateCart(newUser.Id);
-        
-        
-        
+
+
         return (dto, null);
     }
 
@@ -255,7 +289,7 @@ public class UserServices : IUserServices
         return (dto, null);
     }
 
-    public async Task<(UserDto? userDto, string? error)> RegisterAdmin(AdminForm adminForm,IFormFile? profileImage)
+    public async Task<(UserDto? userDto, string? error)> RegisterAdmin(AdminForm adminForm, IFormFile? profileImage)
     {
         var admin = await _repositoryWrapper.AdminRepository.Get(x => x.Email == adminForm.Email);
         if (admin != null)
@@ -271,6 +305,7 @@ public class UserServices : IUserServices
             var image = await _fileService.SaveFileAsync(profileImage);
             user.ProfileImage = image;
         }
+
         user.AdministrativeRole = adminForm.AdministrativeRole;
 
         await _repositoryWrapper.AdminRepository.Add(user);

@@ -41,6 +41,7 @@ public class AuthController : BaseController
 
     [HttpPost("register-admin")]
     [Consumes("multipart/form-data")]
+    [Authorize(Policy = "ManagerPolicy")]
     public async Task<IActionResult> RegisterAdmin([FromForm] AdminForm adminForm)
     {
         var (user, error) = await _userServices.RegisterAdmin(adminForm, adminForm.ProfileImage);

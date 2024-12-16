@@ -1,5 +1,6 @@
 ﻿using BookStoreTask.Orders;
 using BookStoreTask.Utli;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreTask.Cart;
@@ -68,6 +69,7 @@ public class CartController : BaseController
 
 
     [HttpPut("checkout-cart")]
+    [Authorize(Policy = "CustomerPolicy")]
     public async Task<IActionResult> UpdateCart([FromBody] OrdersCreateForm form)
     {
         var (cartDto, error) = await _cartServices.Checkout(form);

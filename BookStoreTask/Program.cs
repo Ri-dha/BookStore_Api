@@ -107,6 +107,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowLocalhost");
 app.UseStaticFiles();
 app.UseHttpsRedirection();
+app.UseMiddleware<LoggingMiddleware>();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
